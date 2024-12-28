@@ -7,7 +7,7 @@ extends CharacterBody2D
 @onready var player: AnimatedSprite2D = $AnimatedSprite2D  # Reference to the player's animated sprite
 @onready var playerAnim: AnimationPlayer = $AnimationPlayer  # Reference to the player's animation player
 # Physics Variables 
-const GRAVITY = 300  # Gravity constant for the player
+const GRAVITY: int = 300  # Gravity constant for the player
 # Export Variables
 @export_category("Movements")
 @export var speed: float  # Speed of the player
@@ -18,16 +18,17 @@ const GRAVITY = 300  # Gravity constant for the player
 @export var jumpVelocity: float  # Jump velocity of the player
 
 # Movements variables
-var moveDirection = 0  # Direction of movement
-var direction     = 0  # Current direction
-var jumpCount     = 0  # Count of jumps performed
+var moveDirection: int = 0  # Direction of movement
+var direction: int     = 0  # Current direction
+var jumpCount: int     = 0  # Count of jumps performed
+var maxJumps: int      = 1  # Maximum number of jumps allowed
 # Input Variables
-var keyUp       = false  # State of the up key
-var keyDown     = false  # State of the down key
-var keyLeft     = false  # State of the left key
-var keyRight    = false  # State of the right key
-var keyJump     = false  # State of the jump key
-var keyJumpHold = false  # State of the jump hold key
+var keyUp: bool       = false  # State of the up key
+var keyDown: bool     = false  # State of the down key
+var keyLeft: bool     = false  # State of the left key
+var keyRight: bool    = false  # State of the right key
+var keyJump: bool     = false  # State of the jump key
+var keyJumpHold: bool = false  # State of the jump hold key
 
 
 func _ready():
@@ -35,14 +36,20 @@ func _ready():
 
 
 func _process(delta: float) -> void:
+	print(jumpCount)
 	# Handle Input
 	GetMovementInput()
 
 	# Handle Movements
-	HorizontalMovement(delta)
-	
+	HorizontalMovement()
+	HandleJump()
+	HandleGravity(delta)
+
 	move_and_slide()  # Move the player and handle collisions
-	
+
+	# Handle Animations
+	AnimationsHandler()
+
 
 func GetMovementInput():
 	keyUp = Input.is_action_pressed("keyUp")
@@ -58,10 +65,48 @@ func GetMovementInput():
 		direction = -1
 
 
-func HorizontalMovement(delta: float):
+func HorizontalMovement():
 	moveDirection = Input.get_axis("keyLeft", "keyRight")
+
 	if moveDirection:
 		velocity.x = move_toward(velocity.x, moveDirection * speed, acceleration * speed)
 	else:
 		velocity.x = move_toward(velocity.x, 0, deceleration * speed)
 	moveDirection = Input.get_axis("keyLeft", "keyRight")
+
+
+func HandleJump():
+	if (keyJump):
+		if (jumpCount < maxJumps):
+			velocity.y -= jumpVelocity
+			jumpCount += 1
+			print(jumpCount)
+
+
+func AnimationsHandler():
+	# handle sprite flip
+	player.flip_h = direction < 0
+
+	# Another way to handle sprite flip	
+	#	if direction == 1:
+	#		player.flip_h = false
+	#	elif direction == -1:
+	#		player.flip_h = true
+
+	if is_on_floor():
+		if velocity.x != 0:
+			playerAnim.play("Player/Run")
+		else:
+			playerAnim.play("Player/Idle")
+	else:
+		if velocity.y < 0:
+			playerAnim.play("Player/Jump")
+		else:
+			playerAnim.play("Player/Fall")
+
+func HandleGravity(delta):
+	# Handle Gravity
+	if not is_on_floor():
+		velocity.y += GRAVITY * delta
+	else:
+		jumpCount = 0			
