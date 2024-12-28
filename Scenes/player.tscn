@@ -255,6 +255,9 @@ _data = {
 position = Vector2(239, 143)
 collision_layer = 2
 script = ExtResource("1_alv7a")
+speed = 200.0
+acceleration = 40.0
+jumpVelocity = 300.0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_r2u2w")
