@@ -12,9 +12,9 @@ const GRAVITY: int = 300  # Gravity constant for the player
 @export_category("Movements")
 @export var speed: float  # Speed of the player
 
-@export_range(0, 1) var acceleration: float = 0.1  # Acceleration rate of the player
+@export_range(0, 100) var acceleration: float = 30  # Acceleration rate of the player
 
-@export_range(0, 1) var deceleration: float = 0.1  # Deceleration rate of the player
+@export_range(0, 100) var deceleration: float = 15  # Deceleration rate of the player
 @export var jumpVelocity: float  # Jump velocity of the player
 
 # Movements variables
@@ -69,9 +69,9 @@ func HorizontalMovement():
 	moveDirection = Input.get_axis("keyLeft", "keyRight")
 
 	if moveDirection:
-		velocity.x = move_toward(velocity.x, moveDirection * speed, acceleration * speed)
+		velocity.x = move_toward(velocity.x, moveDirection * speed, acceleration)
 	else:
-		velocity.x = move_toward(velocity.x, 0, deceleration * speed)
+		velocity.x = move_toward(velocity.x, 0, deceleration)
 	moveDirection = Input.get_axis("keyLeft", "keyRight")
 
 
