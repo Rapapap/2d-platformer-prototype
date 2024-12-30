@@ -1,7 +1,8 @@
-[gd_scene load_steps=34 format=3 uid="uid://bt3mih4477s11"]
+[gd_scene load_steps=35 format=3 uid="uid://bt3mih4477s11"]
 
-[ext_resource type="Script" path="res://Entity/Player/player.gd" id="1_gwr0f"]
+[ext_resource type="Script" path="res://Entity/Player/Player.gd" id="1_gwr0f"]
 [ext_resource type="Texture2D" uid="uid://dprftginsj1fc" path="res://Assets/Character base.png" id="2_xo58f"]
+[ext_resource type="Script" path="res://Entity/Player/States/States.gd" id="3_ll8uq"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_1p7hp"]
 atlas = ExtResource("2_xo58f")
@@ -340,6 +341,10 @@ _data = {
 position = Vector2(240, 143)
 collision_layer = 2
 script = ExtResource("1_gwr0f")
+speed = null
+acceleration = null
+deceleration = null
+jumpVelocity = null
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_r2u2w")
@@ -360,10 +365,11 @@ libraries = {
 [node name="Camera2D" type="Camera2D" parent="."]
 
 [node name="StateMachine" type="Node" parent="."]
+script = ExtResource("3_ll8uq")
 
 [node name="Idle" type="Node" parent="StateMachine"]
 
-[node name="Move" type="Node" parent="StateMachine"]
+[node name="Run" type="Node" parent="StateMachine"]
 
 [node name="Jump" type="Node" parent="StateMachine"]
 
