@@ -6,14 +6,16 @@ extends CharacterBody2D
 # Nodes
 @onready var player: AnimatedSprite2D = $AnimatedSprite2D  # Reference to the player's animated sprite
 @onready var playerAnim: AnimationPlayer = $AnimationPlayer  # Reference to the player's animation player
+@onready var camera: Camera2D = $Camera2D  # Reference to the camera
+@onready var States: Node = $StateMachine  # Reference to the state machine
+
 # Physics Variables 
 const GRAVITY: int = 300  # Gravity constant for the player
+
 # Export Variables
 @export_category("Movements")
 @export var speed: float  # Speed of the player
-
 @export_range(0, 100) var acceleration: float = 30  # Acceleration rate of the player
-
 @export_range(0, 100) var deceleration: float = 15  # Deceleration rate of the player
 @export var jumpVelocity: float  # Jump velocity of the player
 
@@ -22,6 +24,7 @@ var moveDirection: int = 0  # Direction of movement
 var direction: int     = 0  # Current direction
 var jumpCount: int     = 0  # Count of jumps performed
 var maxJumps: int      = 1  # Maximum number of jumps allowed
+
 # Input Variables
 var keyUp: bool       = false  # State of the up key
 var keyDown: bool     = false  # State of the down key
@@ -30,11 +33,19 @@ var keyRight: bool    = false  # State of the right key
 var keyJump: bool     = false  # State of the jump key
 var keyJumpHold: bool = false  # State of the jump hold key
 
+# State Machine
+var currentState = null
+var previousState = null
 
 func _ready():
-	pass  # Called when the node is ready
-
-
+	# Initialize State Machine
+	for state in States.get_children():
+		state.States = States
+		state.Player = self
+		
+	previousState = States.fall
+	currentState = States.idle
+	
 func _process(delta: float) -> void:
 	print(jumpCount)
 	# Handle Input
@@ -49,7 +60,14 @@ func _process(delta: float) -> void:
 
 	# Handle Animations
 	AnimationsHandler()
-
+	
+func ChangeState(newState):
+	if newState != null:
+		previousState = currentState
+		currentState = newState
+		previousState.ExitState()
+		currentState.EnterState()
+		print("State Change to: ", newState.Name, " from: ", previousState.Name)
 
 func GetMovementInput():
 	keyUp = Input.is_action_pressed("keyUp")
@@ -106,7 +124,7 @@ func AnimationsHandler():
 
 func HandleGravity(delta):
 	# Handle Gravity
-	if not is_on_floor():
+	if not is_on_floor() and jumpCount < maxJumps:
 		velocity.y += GRAVITY * delta
 	else:
 		jumpCount = 0			
