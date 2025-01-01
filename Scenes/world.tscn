@@ -417,6 +417,6 @@ tile_set = SubResource("TileSet_g08yg")
 [node name="Player" parent="." instance=ExtResource("3_7xncj")]
 position = Vector2(296, 197)
 speed = 200.0
-acceleration = 25.0
+acceleration = 15.0
 deceleration = 10.0
-jumpVelocity = 175.0
+jumpVelocity = 100.0
